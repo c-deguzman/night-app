@@ -67,11 +67,9 @@ app.use(bodyParser.urlencoded({
 app.enable('trust proxy');
 
 app.use(function(request, response, next){
-  var okay_route = ["/my_pics", "/my_pics/"];
+  var not_okay_route = ["/login", "/login/", "/register/", "/register"];
 
-  if (request.isAuthenticated() && okay_route.indexOf(request.path) != -1){
-    response.redirect("/user?id=" + request.user._id);
-  } else if (request.isAuthenticated() == false && okay_route.indexOf(request.path) != -1){
+  if (request.isAuthenticated() && not_okay_route.indexOf(request.path) != -1){
     response.redirect("/home");
   } else {
     return next();
