@@ -42,7 +42,7 @@ export default class Login extends React.Component {
             error: data_login.message
           });
         } else if (data_login.result == "success"){
-          window.location.assign("/home");
+          window.location.href = ("/home" + window.location.search);
         }
       });
     }

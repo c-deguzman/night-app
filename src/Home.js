@@ -53,6 +53,14 @@ export default class Home extends React.Component {
         my_locs: data_locs
       });
     });
+
+    if (window.location.search !== ""){
+      var urlParams = new URLSearchParams(window.location.search);
+
+      if (urlParams.has("term") && urlParams.has("area") && urlParams.has("page")){
+        this.yelp_search(urlParams.get("term"), urlParams.get("area"), parseInt(urlParams.get("page")));
+      }
+    }
   }
 
   yelp_search(term, area, page){
@@ -155,7 +163,7 @@ export default class Home extends React.Component {
             {this.state.searched ?
               <h1 className="centre"> {this.state.total_results} Search Results Found </h1> :
               <div>
-                <h1 className="centre"> Search </h1> 
+                <h1 className="centre"> Search Tonight's Nightlife</h1> 
                 <form className="form-horizontal" onSubmit={this.handleSubmit}>
                   <div className="form-group">
                     <label className="control-label col-md-3 col-sm-3" htmlFor="search_term">I'm looking for:</label>
@@ -207,26 +215,33 @@ export default class Home extends React.Component {
               </ul> 
 
 
-              <div className="btn-group centre">
-                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, 0)}>First</button>
-               
+              <div className="btn-group centre" id="pagination">
                 { 
                   this.state.curr_page > 0 ?
+                    <div>
+                    <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, 0)}>First</button>
                     <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page - 1)}>
                       Previous
-                    </button> :
+                    </button> 
+                    </div>:
                     null
                 }
                 {
                   this.state.curr_page < Math.floor(this.state.total_results / 30) - 1 ?
+                    <div>
                     <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page + 1)}>
                       Next
-                    </button> :
+                    </button> 
+                    <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, Math.floor(this.state.total_results / 30) - 1)}>
+                      Last
+                    </button>
+                    </div>:
                     null
                 }
-                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, Math.floor(this.state.total_results / 30) - 1)}>
-                  Last
-                </button>
+              </div>
+
+              <div className="centre" id="page_num">
+                <p>Page {this.state.curr_page + 1}</p>
               </div>
             </div> :
             null
