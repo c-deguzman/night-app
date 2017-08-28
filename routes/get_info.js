@@ -20,8 +20,8 @@ module.exports = {
     });
   },
 
-  get_likes(app){
-    app.post('/get_likes', function(request, response){
+  get_loc_goings(app){
+    app.post('/get_loc_goings', function(request, response){
 
       var MongoClient = require('mongodb').MongoClient;
 
@@ -34,14 +34,51 @@ module.exports = {
             return;
           }
 
-          db.collection("likes", function (err, collection){
+          db.collection("goings", function (err, collection){
 
             if (err){
               throw err;
               return;
             } 
 
-            collection.find({from: request.user._id}).toArray(function (err, docs) {
+            collection.find({loc: request.body.loc}).toArray(function (err, docs) {
+              if (err){
+                throw err;
+                return;
+              } 
+
+              response.send(docs.length);
+            });
+          });
+        });
+      }
+    });
+  },
+
+  get_my_goings(app){
+    app.post('/get_my_goings', function(request, response){
+
+      var MongoClient = require('mongodb').MongoClient;
+
+      var days = Math.round(new Date().getTime() / 86400000);
+
+      if (!request.isAuthenticated()){
+        response.send([]);
+      } else {
+        MongoClient.connect(process.env.MONGO_CONNECT, function (err, db){
+          if (err){
+            throw err;
+            return;
+          }
+
+          db.collection("goings", function (err, collection){
+
+            if (err){
+              throw err;
+              return;
+            } 
+
+            collection.find({user: request.user._id, time: {$eq: days}}).toArray(function (err, docs) {
               if (err){
                 throw err;
                 return;
@@ -50,15 +87,46 @@ module.exports = {
               var return_array = [];
 
               for (var i in docs){
-                return_array.push(docs[i].photo_id);
+                return_array.push(docs[i].loc);
               }
 
               response.send(return_array);
-
             });
           });
         });
       }
+    });
+  },
+
+  get_loc_goings(app){
+    app.post('/get_loc_goings', function(request, response){
+
+      var MongoClient = require('mongodb').MongoClient;
+
+      MongoClient.connect(process.env.MONGO_CONNECT, function (err, db){
+        if (err){
+          throw err;
+          return;
+        }
+
+        db.collection("goings", function (err, collection){
+
+          if (err){
+            throw err;
+            return;
+          } 
+
+          collection.find({loc: request.body.loc}).toArray(function (err, docs) {
+            if (err){
+              throw err;
+              return;
+            } 
+
+            response.send({len: docs.length});
+          });
+        });
+      });
+      
     });
   },
 
@@ -99,69 +167,6 @@ module.exports = {
     });
   },
 
-  get_pics(app){
-    app.post('/get_pics', function(request, response) {
-      
-      var MongoClient = require('mongodb').MongoClient;
-
-      MongoClient.connect(process.env.MONGO_CONNECT, function (err, db){
-        if (err){
-          throw err;
-          return;
-        }
-
-        db.collection("photos", function (err, collection){
-
-          if (err){
-            throw err;
-            return;
-          } 
-
-          collection.find({}, {"sort" : [['time', 'descending']]}).toArray(function (err, documents) {
-
-            if (err){
-              throw err;
-              return;
-            }
-
-            response.send(documents);
-          });   
-        });
-      });
-    });
-  },
-
-  get_pics_user(app){
-    app.post('/get_pics_user', function(request, response) {
-      
-      var MongoClient = require('mongodb').MongoClient;
-
-      MongoClient.connect(process.env.MONGO_CONNECT, function (err, db){
-        if (err){
-          throw err;
-          return;
-        }
-
-        db.collection("photos", function (err, collection){
-
-          if (err){
-            throw err;
-            return;
-          } 
-
-          collection.find({user_id: request.body.id}, {"sort" : [['time', 'descending']]}).toArray(function (err, documents) {
-
-            if (err){
-              throw err;
-              return;
-            }
-
-            response.send(documents);
-          });   
-        });
-      });
-    });
-  },
 
   set_disp(app){
     app.post("/set_disp", function(request, response){

@@ -11,13 +11,6 @@ module.exports = function(app){
 		  consumer_secret: process.env.YELP_SECRET
 		});
 		 
-
-		var params = {
-		    query: 'food',
-		    location: 'Toronto',
-		    limit: 50
-		}
-		 
 		yelp.searchBusiness(request.body)
 		 .then(data => response.send(data))
 		 .catch(err => err);

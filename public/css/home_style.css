@@ -26,7 +26,7 @@ p, .basic, input[type='text'] {
 }
 
 .result {
-  height: 120px;
+  height: 250px;
 }
 
 .img_result {
@@ -36,11 +36,10 @@ p, .basic, input[type='text'] {
   border: solid;
   border-color: black;
   border-width: 2px;
+
+  margin-top: 50px;
 }
 
-.img_result:hover {
-  
-}
 
 .card {
   width: 250px;

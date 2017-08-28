@@ -15,6 +15,11 @@ export default class Home extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.yelp_search = this.yelp_search.bind(this);
 
+    this.going = this.going.bind(this);
+    this.not_going = this.not_going.bind(this);
+
+    this.login = this.login.bind(this);
+
     this.state = {
       locs: [],
       my_locs: [],
@@ -38,9 +43,28 @@ export default class Home extends React.Component {
         user: data_user
       });
     });
+
+    $.ajax({
+      type: "POST",
+      url: "/get_my_goings",
+      contentType: 'application/json'
+    }).done((data_locs) => {
+      this.setState({
+        my_locs: data_locs
+      });
+    });
   }
 
   yelp_search(term, area, page){
+
+    if (this.state.searched){
+      if (page < 0){
+        page = 0;
+      } else if (page > Math.floor(this.state.total_results / 30) - 1){
+        page = Math.floor(this.state.total_results / 30) - 1;
+      }
+    }
+
     $.ajax({
       type: "POST",
       url: "/yelp",
@@ -52,10 +76,24 @@ export default class Home extends React.Component {
         search_area: area,
         locs: data.businesses,
         searched: true,
-        total_results: data.total,
+        total_results: Math.min(data.total, 1000),
         curr_page: page
       })
     }, () => {
+
+      this.state.locs.map((item,i) => 
+        $.ajax({
+          type: "POST",
+          url: "/get_loc_goings",
+          contentType: 'application/json',
+          data: JSON.stringify({loc: item.id})
+        }).done((loc_going) => {
+          this.setState({
+            [item.id]: loc_going.len
+          });
+        })
+      )
+
       window.scrollTo(0, 0);
     });
   }
@@ -68,6 +106,42 @@ export default class Home extends React.Component {
 
     this.yelp_search(term, area, 0);
   
+  }
+
+  going(id){
+    $.ajax({
+      type: "POST",
+      url: "/set_going",
+      contentType: 'application/json',
+      data: JSON.stringify({id: id})
+    }).done((data) => {
+      if (data.result == "success"){
+        this.setState({
+          [id]: this.state[id] + 1, 
+          my_locs: this.state.my_locs.concat([id])
+        });
+      }
+    });
+  }
+
+  not_going(id){
+    $.ajax({
+      type: "POST",
+      url: "/set_not_going",
+      contentType: 'application/json',
+      data: JSON.stringify({id: id})
+    }).done((data) => {
+      if (data.result == "success"){
+        this.setState({
+          [id]: this.state[id] - 1, 
+          my_locs: this.state.my_locs.filter((item) => item != id)
+        });
+      }
+    });
+  }
+
+  login(){
+    window.location.href = "/login?term=" + this.state.search_term + "&area=" + this.state.search_area + "&page=" + this.state.curr_page;
   }
 
   render() {
@@ -86,13 +160,13 @@ export default class Home extends React.Component {
                   <div className="form-group">
                     <label className="control-label col-md-3 col-sm-3" htmlFor="search_term">I'm looking for:</label>
                     <div className="col-md-6 col-sm-6">
-                      <input type="text" className="form-control" id="search_term" name="search_term" placeholder="Enter search term(s) here" onChange={this.changeQuery}  required/>
+                      <input type="text" className="form-control" id="search_term" name="search_term" placeholder="Enter search term(s) here" required/>
                     </div>
                   </div>
                   <div className="form-group">
                     <label className="control-label col-md-3 col-sm-3" htmlFor="search_area">In the area of:</label>
                     <div className="col-md-6 col-sm-6">
-                      <input type="text" className="form-control" id="search_area" name="search_area" placeholder="Enter location here" onChange={this.changeQuery}  required/>
+                      <input type="text" className="form-control" id="search_area" name="search_area" placeholder="Enter location here" required/>
                     </div>
                   </div>
                   <div className="form-group">
@@ -113,23 +187,47 @@ export default class Home extends React.Component {
                   this.state.locs.map((item,i) => 
                       <li key={i} className="list-group-item result" onClick={() => {}}> 
                         <div className="right">
-                          <img src={this.state.locs[i].image_url} className="img_result"/>
+                          <img src={item.image_url} className="img_result"/>
                         </div>
-                        <h3>{this.state.locs[i].name}</h3>
-                        <p>Yelp Rating: {this.state.locs[i].rating}</p>
+                        <h3>{item.name}</h3>
+                        <p>Yelp Quality Rating: {item.rating}</p>
+                        <p>Yelp Price Rating: {item.price}</p>
+                        <p>{item.location.address1}</p>
+                        <p>People going: {this.state[item.id]}</p>
+                        {
+                          (this.state.user === false) ?
+                          <button className="btn btn-default" onClick={this.login}> Mark GOING </button> :
+                            (this.state.my_locs.indexOf(item.id) == -1) ?
+                            <button className="btn btn-default" onClick={() => this.going(item.id)}> Mark GOING </button> :
+                            <button className="btn btn-default" onClick={() => this.not_going(item.id)}> Mark NOT GOING </button>                             
+                        }
+                        
                       </li>)
                 }
               </ul> 
-              {
-                (this.state.curr_page != 0) ?
-                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page - 1)}>Last Page</button> :
-                null
-              } 
-              {
-                (this.state.curr_page * 30 < this.state.total_results) ?
-                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page + 1)}>Next Page</button> :
-                null
-              } 
+
+
+              <div className="btn-group centre">
+                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, 0)}>First</button>
+               
+                { 
+                  this.state.curr_page > 0 ?
+                    <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page - 1)}>
+                      Previous
+                    </button> :
+                    null
+                }
+                {
+                  this.state.curr_page < Math.floor(this.state.total_results / 30) - 1 ?
+                    <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page + 1)}>
+                      Next
+                    </button> :
+                    null
+                }
+                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, Math.floor(this.state.total_results / 30) - 1)}>
+                  Last
+                </button>
+              </div>
             </div> :
             null
           }
