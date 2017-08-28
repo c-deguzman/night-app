@@ -35,7 +35,7 @@ require('./authentication').init(app);
 
 app.use(cookieParser());
 
-//app.use(cors({origin: "https://photo-app-zeta.herokuapp.com/"}));
+app.use(cors({origin: "https://night-app-eta.herokuapp.com/"}));
 
 app.use(session({  
   store: new RedisStore({
