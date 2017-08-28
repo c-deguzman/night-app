@@ -3,7 +3,6 @@ import $ from 'jquery';
 import Navbar from './Navbar';
 import Alert from './Alert';
 import Confirm from 'react-confirm-bootstrap';
-import MasonryInfiniteScroller from 'react-masonry-infinite';
 import update from 'immutability-helper';
 
 
@@ -13,14 +12,17 @@ export default class Home extends React.Component {
     
     this.render = this.render.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
-    this.like_pic = this.like_pic.bind(this);
-    this.unlike_pic = this.unlike_pic.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.yelp_search = this.yelp_search.bind(this);
 
     this.state = {
-      pics: [],
-      my_likes: [],
+      locs: [],
+      my_locs: [],
       user: false,
-      no_img: "https://pbs.twimg.com/profile_images/600060188872155136/st4Sp6Aw.jpg"
+      no_img: "https://pbs.twimg.com/profile_images/600060188872155136/st4Sp6Aw.jpg",
+      curr_page: 0,
+      searched: false,
+      total_results: 0
     }
   }
   
@@ -36,78 +38,36 @@ export default class Home extends React.Component {
         user: data_user
       });
     });
+  }
 
+  yelp_search(term, area, page){
     $.ajax({
       type: "POST",
-      url: "/get_pics",
-      contentType: 'application/json'
-    }).done((data_pics) => {
+      url: "/yelp",
+      contentType: "application/json",
+      data: JSON.stringify({term: term, location: area, limit: 30, offset: page * 30})
+    }).done((data) =>{
       this.setState({
-        pics: data_pics
+        search_term: term,
+        search_area: area,
+        locs: data.businesses,
+        searched: true,
+        total_results: data.total,
+        curr_page: page
       })
-    });
-
-    $.ajax({
-      type: "POST",
-      url: "/get_likes",
-      contentType: 'application/json'
-    }).done((data_likes) => {
-      this.setState({
-        my_likes: data_likes
-      })
+    }, () => {
+      window.scrollTo(0, 0);
     });
   }
 
-  like_pic(index){
-    $.ajax({
-      type: "POST",
-      url: "/like",
-      contentType: 'application/json',
-      data: JSON.stringify({id: this.state.pics[index]._id})
-    }).done((data) => {
+  handleSubmit(event){
+    event.preventDefault();
 
-      if (data.result == "success"){
-        var newState = update(this.state, {
-                             pics: {
-                                [index]: {
-                                   likes: { $set: this.state.pics[index].likes + 1}
-                                 }                                                      
-                            }
-                          });
+    var term = event.target.search_term.value;
+    var area = event.target.search_area.value;
 
-        this.setState(newState);
-        this.setState({
-          my_likes: this.state.my_likes.concat([this.state.pics[index]._id])
-        });
-      }
-
-    });
-  }
-
-  unlike_pic(index){
-    $.ajax({
-      type: "POST",
-      url: "/unlike",
-      contentType: 'application/json',
-      data: JSON.stringify({id: this.state.pics[index]._id})
-    }).done((data) => {
-
-      if (data.result == "success"){
-        var newState = update(this.state, {
-                             pics: {
-                                [index]: {
-                                   likes: { $set: this.state.pics[index].likes - 1}
-                                 }                                                      
-                            }
-                          });
-
-        this.setState(newState);
-        this.setState({
-          my_likes: this.state.my_likes.filter((item) => (item != this.state.pics[index]._id))
-        });
-      }
-
-    });
+    this.yelp_search(term, area, 0);
+  
   }
 
   render() {
@@ -116,81 +76,64 @@ export default class Home extends React.Component {
 
         <Navbar logged_in={this.state.user !== false} user={this.state.user} curr="home"/> 
         
-        <div className="page-header container">
-            <h1 className="centre"> Recent Pictures </h1> 
-        </div>
-
-        { 
-          this.state.user === false ? 
-            <p className="centre"> <i className="em em-cry" /> You can't like photos while signed out <i className="em em-broken_heart" /></p> :
-            null
-        }
-        
-        <div className="centre">
-        {
-          (this.state.pics.length > 0) ?
-          <MasonryInfiniteScroller 
-              className="masonry"
-              hasMore={false} 
-              loadMore={() => this.setState({ elements: this.state.elements.push("Element") })}
-              sizes={[
-                { columns: 1, gutter: 20 },
-                { mq: '560px', columns: 2, gutter: 20 },
-                { mq: '800px', columns: 3, gutter: 20 },
-                { mq: '1050px', columns: 4, gutter: 20 },
-                { mq: '1400px', columns: 5, gutter: 20 }
-                ]}
-              >
-            {
-                this.state.pics.map((item,i) => 
-                  <div key={i} className="card centre">
-                    <div>
-                    <img src={this.state.pics[i].url} 
-                      id="preview_pic"
-                      onError={(event) => {
-
-                              var newState = update(this.state, {
-                                                     pics: {
-                                                        [i]: {
-                                                           url: { $set: this.state.no_img}
-                                                         }                                                      
-                                                    }
-                                                  });
-
-                              this.setState(newState);
-                              }
-                            } 
-                      height={this.state.pics[i].height}
-                      />
-                      
-                    <p className={"centre" + (this.state.pics[i].desc != "" ? " desc" : "")}>{this.state.pics[i].desc}</p>
-                    <div className="post_info">
-                      <i className="em em-bust_in_silhouette" onClick={() => window.location.href = "/user?id=" + this.state.pics[i].user_id}/>
-                      { (this.state.user !== false) ?
-                          (this.state.my_likes.indexOf(this.state.pics[i]._id) == -1) ?
-                            <p className="right"> 
-                              <i className="em em-heart" onClick={() => this.like_pic(i)}/> {this.state.pics[i].likes} 
-                            </p> :
-                            <p className="right"> 
-                              <i className="em em-sparkling_heart" onClick={() => this.unlike_pic(i)}/> {this.state.pics[i].likes} 
-                            </p> :
-                          <p className="right"> 
-                            <i className="em em-heart"/> {this.state.pics[i].likes} 
-                          </p> 
-                      }
-                      </div>
+        <div className="container">
+          <div className="page-header">
+            {this.state.searched ?
+              <h1 className="centre"> {this.state.total_results} Search Results Found </h1> :
+              <div>
+                <h1 className="centre"> Search </h1> 
+                <form className="form-horizontal" onSubmit={this.handleSubmit}>
+                  <div className="form-group">
+                    <label className="control-label col-md-3 col-sm-3" htmlFor="search_term">I'm looking for:</label>
+                    <div className="col-md-6 col-sm-6">
+                      <input type="text" className="form-control" id="search_term" name="search_term" placeholder="Enter search term(s) here" onChange={this.changeQuery}  required/>
                     </div>
-                  </div>)
-            }
-        </MasonryInfiniteScroller> :
-          <div className="centre">
-            <p> No recent pictures. Add one! <i className="em em-smiley_cat"/></p>
+                  </div>
+                  <div className="form-group">
+                    <label className="control-label col-md-3 col-sm-3" htmlFor="search_area">In the area of:</label>
+                    <div className="col-md-6 col-sm-6">
+                      <input type="text" className="form-control" id="search_area" name="search_area" placeholder="Enter location here" onChange={this.changeQuery}  required/>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <div className="col-md-1 col-md-offset-3 col-sm-1 col-sm-offset-3">
+                      <button className="btn btn-default" type="submit"> Submit </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+          }
           </div>
-        }
-        </div>
-      
         
-        
+          {
+            this.state.searched ?
+            <div>
+              <ul className="list-group" id="results">
+                {
+                  this.state.locs.map((item,i) => 
+                      <li key={i} className="list-group-item result" onClick={() => {}}> 
+                        <div className="right">
+                          <img src={this.state.locs[i].image_url} className="img_result"/>
+                        </div>
+                        <h3>{this.state.locs[i].name}</h3>
+                        <p>Yelp Rating: {this.state.locs[i].rating}</p>
+                      </li>)
+                }
+              </ul> 
+              {
+                (this.state.curr_page != 0) ?
+                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page - 1)}>Last Page</button> :
+                null
+              } 
+              {
+                (this.state.curr_page * 30 < this.state.total_results) ?
+                <button className="btn btn-default" onClick={() => this.yelp_search(this.state.search_term, this.state.search_area, this.state.curr_page + 1)}>Next Page</button> :
+                null
+              } 
+            </div> :
+            null
+          }
+        </div> 
       </div>
     );
   }

@@ -57,20 +57,6 @@ module.exports = function(app){
 	  }));
 	});
 
-	
-	app.get('/add_pic', function(request, response) {
-	  var App = require(process.env.ROOT + "/src/AddPic.js").default;
-	  var Html = require(process.env.ROOT + "/src/addPic_template").default;
-
-	  var Comp_Fact = React.createFactory(App);
-	  const React_string = ReactDOM.renderToString(Comp_Fact());
-	  
-	  response.send(Html({
-	    body: React_string,
-	    title: "Add Picture"
-	  }));
-	});
-
 
 	app.get('/first', function(request, response) {
 		if (request.isAuthenticated()){
@@ -106,20 +92,5 @@ module.exports = function(app){
 		} else {
 			response.redirect("/home");
 		}
-	});
-
-	app.get('/user', function(request, response) {
-
-		var App = require(process.env.ROOT + "/src/UserWall.js").default;
-		var Html = require(process.env.ROOT + "/src/userWall_template").default;
-
-		var Comp_Fact = React.createFactory(App);
-		const React_string = ReactDOM.renderToString(Comp_Fact());
-
-		response.send(Html({
-			body: React_string,
-			title: "User Pictures"
-		}));
-		
 	});
 }

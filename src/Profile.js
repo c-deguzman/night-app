@@ -73,8 +73,8 @@ export default class FirstNotice extends React.Component {
 
         <div className="centre">
           <div id="notice_box">
-            <h1 id="title"> Hi again </h1>
-            <p className="basic"> So you want to change your display name <i className="em em-interrobang" /> <i className="em  em-anguished" /> We thought your old name was cool ... but we're sure you know what you're doing <i className="em em-innocent" /></p>
+            <h1 id="title"> Update Profile </h1>
+            <p className="basic">You can update your display name at any time, as many times as you want.</p>
             
             <div className="centre">
               <form className="form-horizontal" onSubmit={this.handle_submit}>

@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 require('babel-core/register');
+require('babel-polyfill');
 
 
 process.env.ROOT = __dirname;
@@ -34,7 +35,7 @@ require('./authentication').init(app);
 
 app.use(cookieParser());
 
-app.use(cors({origin: "https://photo-app-zeta.herokuapp.com/"}));
+//app.use(cors({origin: "https://photo-app-zeta.herokuapp.com/"}));
 
 app.use(session({  
   store: new RedisStore({
@@ -102,7 +103,7 @@ app.listen(process.env.PORT || 3000, function(err) {
     return console.error(err);
   }
 
-  console.log('Listening at ' + process.env.BASE_URL);
+  console.log('Listening at localhost:' + (process.env.PORT || 3000));
 });
 
 // ------------------------------------------------------------ MISC FUNCTIONS ---------------------------------------------------------------------------

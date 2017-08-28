@@ -45,6 +45,9 @@ export default class Register extends React.Component {
           this.setState({
             status: data.result,
             error_show: true
+          }, () =>{
+            document.getElementById("register_form").reset();
+            window.location.assign("/login");
           });
         }
       });
@@ -58,7 +61,7 @@ export default class Register extends React.Component {
         <h1 className="centre">Register</h1>
         
         <div className="centre">
-          <form className="form-horizontal" onSubmit={this.handle_submit}>
+          <form className="form-horizontal" onSubmit={this.handle_submit} id="register_form">
             <div className="form-group">
               <label className="control-label col-sm-2" htmlFor="email">Email*:</label>
               <div className="col-sm-12">
@@ -92,15 +95,8 @@ export default class Register extends React.Component {
       </div>
 
 
-        <Alert show={this.state.error_show} changeShow={() => this.setState({error_show: false})} result={this.state.status} error={this.state.error} success={"Account created successfully."} /> :
-
-
-        <div className="centre">
-          <ul className="share-buttons">
-            <li><button className="btn btn-info"  title="Sign Up" onClick={() => window.location.href = "/auth/twitter"}> Sign up with Twitter &nbsp; <img alt="Tweet" src="https://cdn.glitch.com/19e2a3cd-8ff2-440c-96c3-2754b3a6f3de%2FTwitter.png?1501451189090" /></button></li>
-          </ul>
-        </div>
-      </div>
+      <Alert show={this.state.error_show} changeShow={() => this.setState({error_show: false})} result={this.state.status} error={this.state.error} success={"Account created successfully. Redirecting you to login."} />
+    </div>
     );
   }
 }

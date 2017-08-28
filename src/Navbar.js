@@ -16,14 +16,12 @@ export default class Navbar extends React.Component {
 	      		<div className="container-fluid">
 		            <div className="navbar-header">
 		              <div className="navbar-header">
-		                <a className="navbar-brand" href="/">Photo App Zeta</a>
+		                <a className="navbar-brand" href="/">Night App Eta</a>
 		            </div>
 		            </div>
 
 		            <ul className="nav navbar-nav">
 		              <li className={this.props.curr == "home" ? "active" : ""}><a href="/home">Home</a></li>
-		              <li className={this.props.curr == "add_pic" ? "active" : ""}><a href="/add_pic">Add Photo</a></li>
-		              <li className={this.props.curr == "my_pics" ? "active" : ""}><a href="/my_pics">My Photos</a></li>
 		            </ul> 
 		             
 		            <p className="navbar-text"> Signed in as {this.props.user} </p> 
@@ -41,7 +39,7 @@ export default class Navbar extends React.Component {
 	      		<div className="container-fluid">
 		            <div className="navbar-header">
 		              	<div className="navbar-header">
-		                	<a className="navbar-brand" href="/">Photo App Zeta</a>
+		                	<a className="navbar-brand" href="/">Night App Eta</a>
 		            	</div>
 		            </div>
 

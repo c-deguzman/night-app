@@ -53,8 +53,7 @@ export default class FirstNotice extends React.Component {
         <div className="centre">
           <div id="notice_box">
             <h1 id="title"> Hey there! </h1>
-            <p className="basic"> Looks like it's your first time with us <i className="em em-smirk" />! It's always nice to have new faces <i className="em em-baby" />. We excitedly welcome <strong>you</strong> to the Photo App Zeta community (it's gonna be <i className="em em-fire" />  with you here <i className="em em-100" />). But, we're at a loss  <i className="em em-anguished" /><i className="em em-cold_sweat" /> ... We don't know your name! Please choose a display name that's as beautiful as you are <i className="em em-sparkling_heart"/> ~ thanks! </p>
-            
+            <p className="basic"> Looks like it's your first time with us. Please set your display name below. </p>
             <div className="centre">
               <form className="form-horizontal" onSubmit={this.handle_submit}>
 	            <div className="form-group">
@@ -72,7 +71,7 @@ export default class FirstNotice extends React.Component {
 	          </form>
         	</div>
 
-        	<p className="basic"> Psst. You can change your display name later if you want. </p>
+        	<p className="basic"> You may change your display name later if you want. </p>
           </div>
         </div>
 

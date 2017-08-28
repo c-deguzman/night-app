@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Megrim|Quicksand');
 
 h1, h2, h3, h4, th, li, .navbar-text, .navbar-brand, label, .btn{
-  font-family: 'Megrim', cursive;
+  font-family: 'Quicksand', sans-serif;
 }
 
 #title {
-  font-family: 'Megrim', cursive;
+  font-family: 'Quicksand', sans-serif;
   font-size: 50px;
   text-align: center;
 }
@@ -18,11 +18,6 @@ p, .basic, input[type='text'] {
   font-size: 20px;
 }
 
-h1 {
-  font-family: 'Megrim', cursive;
-  font-weight: bold;
-}
-
 .centre{
   display: flex;
   width: 100%;
@@ -30,45 +25,21 @@ h1 {
   justify-content: center;
 }
 
-
-label {
-  margin-right: 2%;
-}
-
-#welcome {
-  margin-bottom: 40px;
-}
-
-#results {
-  width: 80%;
-  margin-top: 3%;
+.result {
+  height: 120px;
 }
 
 .img_result {
-  width: 120px;
-  height: 180px;
-}
+  width: 100px;
+  height: 100px;
 
-.img_result:hover {
   border: solid;
   border-color: black;
   border-width: 2px;
 }
 
-body {
+.img_result:hover {
   
-}
-
-#preview_pic {
-  border: solid;
-  width: 250px;
-}
-
-
-.masonry {
-  max-width: 100%;
-  width: 100%;
-  min-width: 100%;
 }
 
 .card {
@@ -82,12 +53,4 @@ body {
 
 .right {
   float: right;
-}
-
-.post_info {
-  padding: 10px;
-}
-
-.desc {
-  margin-top: 40px;
 }

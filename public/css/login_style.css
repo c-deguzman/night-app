@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Megrim|Quicksand');
 
 h1, h2, h3, h4, th, li, .navbar-text, .navbar-brand, label, .btn{
-  font-family: 'Megrim', cursive;
+  font-family: 'Quicksand', sans-serif;
 }
 
 p, .basic, input[type='text'], input[type='email'], input[type='password'] {

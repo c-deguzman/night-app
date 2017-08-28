@@ -6,7 +6,7 @@ export default ({ body, title}) => {
       <head>
         <title>${title}</title>
         <meta name="description" content="Pinterest Clone.">
-        <link id="favicon" rel="icon" href="/icon/favicon.ico" type="image/x-icon">
+        <link id="favicon" rel="icon" href="/icon/icon.ico" type="image/x-icon">
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">

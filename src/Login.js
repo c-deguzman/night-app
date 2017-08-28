@@ -79,12 +79,6 @@ export default class Login extends React.Component {
           </form>
         </div>
 
-        <div className="centre">
-          <ul className="share-buttons">
-            <li><button className="btn btn-info"  title="Log In" onClick={() => window.location.href = "/auth/twitter"}> Log in with Twitter &nbsp; <img alt="Tweet" src="https://cdn.glitch.com/19e2a3cd-8ff2-440c-96c3-2754b3a6f3de%2FTwitter.png?1501451189090" /></button></li>
-          </ul>
-        </div>
-
         <Alert show={this.state.error_show} changeShow={() => this.setState({error_show: false})} result={this.state.result} error={this.state.error} success={"Login successful! Redirecting now."} /> :
 
       </div>
